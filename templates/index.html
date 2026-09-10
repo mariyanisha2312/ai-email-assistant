@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Email Assistant</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <div class="icon">✉️</div>
+
+            <h1>AI Email Assistant</h1>
+
+            <p>Generate professional emails instantly with AI</p>
+        </div>
+
+
+        <div class="card">
+
+            <label>Email Type</label>
+
+            <select id="emailType">
+
+                <option>Job Application</option>
+                <option>Interview Follow-up</option>
+                <option>Leave Request</option>
+                <option>College Request</option>
+                <option>Complaint</option>
+                <option>General</option>
+
+            </select>
+
+
+            <label>What do you want to write?</label>
+
+            <textarea
+                id="userRequest"
+                placeholder="Example: I want to ask HR about my interview result..."
+            ></textarea>
+
+
+            <button onclick="generateEmail()">
+
+                ✨ Generate Email
+
+            </button>
+
+
+            <div id="loading">
+
+                🤖 AI is writing your email...
+
+            </div>
+
+
+            <div class="result">
+
+                <div class="result-header">
+
+                    <h2>Generated Email</h2>
+
+                    <button
+                        class="copy-btn"
+                        onclick="copyEmail()">
+                        📋 Copy
+                    </button>
+
+                </div>
+
+
+                <textarea
+                    id="result"
+                    readonly
+                    placeholder="Your generated email will appear here..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+<script>
+
+async function generateEmail() {
+
+    const emailType =
+        document.getElementById("emailType").value;
+
+    const userRequest =
+        document.getElementById("userRequest").value;
+
+    if (!userRequest.trim()) {
+
+        alert("Please describe what you want to write.");
+
+        return;
+    }
+
+
+    document.getElementById("loading").style.display = "block";
+
+
+    try {
+
+        const response = await fetch("/generate", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                email_type: emailType,
+
+                request: userRequest
+
+            })
+
+        });
+
+
+      const data = await response.json();
+
+if (data.success) {
+
+    document.getElementById("result").value = data.email;
+
+} else {
+
+    alert(data.message);
+
+}
+    }
+
+    catch (error) {
+
+        alert("Something went wrong. Please try again.");
+
+    }
+
+
+    document.getElementById("loading").style.display = "none";
+}
+
+
+function copyEmail() {
+
+    const email =
+        document.getElementById("result").value;
+
+    navigator.clipboard.writeText(email);
+
+    alert("Email copied!");
+
+}
+
+</script>
+
+</body>
+
+</html>
